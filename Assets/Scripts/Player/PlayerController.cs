@@ -22,14 +22,18 @@ public class PlayerController : MonoBehaviour
     public int life;
     public TextMeshProUGUI textLife;
     public string levelName;
+    public int nextLevel;
     public GameObject gameOver;
     public float alturaLimite;
+    public GameObject canvasPause;
+    public bool isPaused;
 
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        Time.timeScale = 1;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
@@ -49,13 +53,18 @@ public class PlayerController : MonoBehaviour
         textLife.text = life.ToString();
 
         if(life <= 0)
-        { 
-            gameOver.SetActive(true);
+        {
+            Morreu();
         }
 
         if (transform.position.y < alturaLimite)
         {
-            gameOver.SetActive(true);
+            Morreu();
+        }
+
+        if (Input.GetButtonDown("Cancel"))
+        {
+            PauseScreen();
         }
     }
 
@@ -111,6 +120,12 @@ public class PlayerController : MonoBehaviour
          anim.SetBool("isJump", true);
     }
 
+    void Morreu()
+    {
+        Time.timeScale = 0;
+        gameOver.SetActive(true);
+    }
+
     void OnCollisionEnter2D(Collision2D collision)
     {
         if(collision.gameObject.tag == "Ground")
@@ -133,4 +148,31 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void PauseScreen()
+    {
+        if (isPaused)
+        {
+            isPaused = false;
+            Time.timeScale = 1;
+            canvasPause.SetActive(false);
+        }
+        else
+        {
+            isPaused = true;
+            Time.timeScale = 0;
+            canvasPause.SetActive(true);
+        }
+    }
+
+    public void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1;
+        canvasPause.SetActive(false);
+    }
+
+    public void BackMainMenu()
+    {
+        SceneManager.LoadScene(0);
+    }
 }
